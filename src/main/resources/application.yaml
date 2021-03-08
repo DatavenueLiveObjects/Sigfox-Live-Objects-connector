@@ -1,0 +1,29 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: sigfox2Lo
+  datasource:
+    url: jdbc:h2:file:${basedir:.}/data/sigfox-connector-db
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+lo:
+  hostname: liveobjects.orange-business.com
+  api-key: YOUR_API_KEY
+  device-group: _YOUR_DEVICE_GROUP_NAME
+  synchronization-interval: 60000
+  synchronization-thread-pool-size: 40
+  message-retry-days: 10
+  page-size: 20
+  message-qos: 1  
+  mqtt-persistence-dir: ${basedir:.}/temp/
+  
+sigfox:
+  hostname: https://api.sigfox.com/v2
+  login: YOUR_SIGFOX_LOGIN
+  password: YOUR_SIGFOX_PASSWORD
