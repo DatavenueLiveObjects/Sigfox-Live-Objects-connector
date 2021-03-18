@@ -13,6 +13,7 @@ import com.orange.lo.sdk.rest.devicemanagement.Inventory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.orange.lo.sample.sigfox2lo.sigfox.SigfoxService;
 import com.orange.lo.sample.sigfox2lo.sigfox.model.DataUpDto;
 import com.orange.lo.sdk.LOApiClient;
 import com.orange.lo.sdk.externalconnector.model.DataMessage;
@@ -40,10 +41,14 @@ public class LoService {
 	private Groups groups;
 	private DataManagementExtConnector dataManagementExtConnector;
 
-	public LoService(LOApiClient loApiClient, LoProperties loProperties, LoDeviceCache loDeviceCache,
+	private SigfoxService sigfoxService;
+	
+
+	public LoService(LOApiClient loApiClient, LoProperties loProperties, SigfoxService sigfoxService, LoDeviceCache loDeviceCache,
 					 RetryPolicy<List<Device>> restDevicesRetryPolicy, RetryPolicy<Group> restGroupRetryPolicy,
 					 RetryPolicy<Void> mqttRetryPolicy) {
 		this.loProperties = loProperties;
+		this.sigfoxService = sigfoxService;
 		this.loDeviceCache = loDeviceCache;
 		this.restDevicesRetryPolicy = restDevicesRetryPolicy;
 		this.restGroupRetryPolicy = restGroupRetryPolicy;
@@ -70,9 +75,11 @@ public class LoService {
 		groupId = group.getId();
 	}
 
-	public void createDevice(String nodeId) {
+	public void createDevice(String nodeId, String deviceName) {
 		Failsafe.with(restDevicesRetryPolicy).run(() -> {
-			inventory.createDevice(XCONNECTOR_DEVICES_PREFIX + nodeId, groupId);
+			Group group = new Group().withId(groupId);
+	    	Device device = new Device().withId(XCONNECTOR_DEVICES_PREFIX + nodeId).withName(deviceName).withGroup(group);
+			inventory.createDevice(device);
 			loDeviceCache.add(nodeId);
 		});
 	}
@@ -125,7 +132,8 @@ public class LoService {
 
 	private void ensureDeviceExists(String nodeId) {
 		if (!loDeviceCache.contains(nodeId)) {
-			createDevice(nodeId);
+			String name = sigfoxService.getDevice(nodeId).getName();
+			createDevice(nodeId, name);
 			sendStatus(nodeId);
 		}
 	}

@@ -27,6 +27,11 @@ public class SigfoxService {
 		this.restTemplate = restTemplate;		
 	}
 
+	public Device getDevice(String deviceId) {
+		ResponseEntity<Device> response = restTemplate.exchange(devicesUrl + "/" + deviceId, HttpMethod.GET, null, Device.class);
+		return response.getBody();
+	}
+	
 	public List<Device> getDevices() {
 		List<Device> devices = new ArrayList<>();
 

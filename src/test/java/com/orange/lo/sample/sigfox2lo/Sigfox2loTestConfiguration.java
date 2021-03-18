@@ -1,5 +1,7 @@
 package com.orange.lo.sample.sigfox2lo;
 
+import com.orange.lo.sample.sigfox2lo.sigfox.SigfoxService;
+import com.orange.lo.sample.sigfox2lo.sigfox.model.Device;
 import com.orange.lo.sample.sigfox2lo.sync.SynchronizationManagement;
 import com.orange.lo.sdk.LOApiClient;
 import com.orange.lo.sdk.externalconnector.DataManagementExtConnector;
@@ -40,6 +42,15 @@ public class Sigfox2loTestConfiguration {
         return loApiClient;
     }
 
+    @Bean SigfoxService sigfoxService() {
+    	SigfoxService sigfoxService = Mockito.mock(SigfoxService.class);
+    	Device device = new Device();
+    	device.setId("N0D3ID1");
+    	device.setName("N0D3ID1-name");
+    	when(sigfoxService.getDevice(anyString())).thenReturn(device);
+    	return sigfoxService;
+    }
+    
     @Bean
     RestTemplate restTemplate() {
         return Mockito.mock(RestTemplate.class);

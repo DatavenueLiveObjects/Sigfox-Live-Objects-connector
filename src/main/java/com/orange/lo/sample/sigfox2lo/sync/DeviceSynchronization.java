@@ -4,8 +4,11 @@ import static com.orange.lo.sdk.rest.devicemanagement.Inventory.XCONNECTOR_DEVIC
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -37,10 +40,8 @@ public class DeviceSynchronization implements Synchronization {
 		LOG.info("Synchronizing devices ");
     	
     	try {
-    		Set<String> sigFoxDeviceIds = sigfoxService.getDevices().stream()
-					.map(Device::getId)
-					.collect(Collectors.toSet());
-        	LOG.debug("Got {} devices from SigFox", sigFoxDeviceIds.size());
+    		Map<String, Device> sigFoxDevices = sigfoxService.getDevices().stream().collect(Collectors.toMap(Device::getId, Function.identity()));
+        	LOG.debug("Got {} devices from SigFox", sigFoxDevices.size());
         	
         	Set<String> loDeviceIds = loService.getDevices().stream()
 					.map(com.orange.lo.sdk.rest.model.Device::getId)
@@ -49,18 +50,18 @@ public class DeviceSynchronization implements Synchronization {
         	loService.addDevicesToCache(loDeviceIds);
         	LOG.debug("Got {} devices from Live Objects", loDeviceIds.size());
         	
+        	// remove devices from LO
+        	Set<String> devicesToRemoveFromLo = new HashSet<>(loDeviceIds);
+        	devicesToRemoveFromLo.removeAll(sigFoxDevices.keySet());
+        	LOG.debug("Devices to remove from LO: {}", devicesToRemoveFromLo);
+
         	// add devices to LO
-            Set<String> devicesToAddToLo = new HashSet<>(sigFoxDeviceIds);
-            devicesToAddToLo.removeAll(loDeviceIds);
-            LOG.debug("Devices to add to LO: {}", devicesToAddToLo);
+        	sigFoxDevices.keySet().removeAll(loDeviceIds);
+            LOG.debug("Devices to add to LO: {}", sigFoxDevices.values());
             
-            // remove devices from LO
-            Set<String> devicesToRemoveFromLo = new HashSet<>(loDeviceIds);
-            devicesToRemoveFromLo.removeAll(sigFoxDeviceIds);
-            LOG.debug("Devices to remove from LO: {}", devicesToRemoveFromLo);
             
-            Set<CreateDeviceTask> createDeviceTasks = devicesToAddToLo.stream()
-					.map(id -> new CreateDeviceTask(loService, id))
+            Set<CreateDeviceTask> createDeviceTasks = sigFoxDevices.values().stream()
+					.map(d -> new CreateDeviceTask(loService, d.getId(), d.getName()))
 					.collect(Collectors.toSet());
             synchronizingExecutor.invokeAll(createDeviceTasks);
 

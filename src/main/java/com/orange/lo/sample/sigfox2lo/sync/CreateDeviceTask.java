@@ -14,16 +14,18 @@ public class CreateDeviceTask implements Callable<Void>{
 	
 	private LoService loService;
 	private String deviceId;
+	private String deviceName;
 
-	public CreateDeviceTask(LoService loService, String deviceId) {
+	public CreateDeviceTask(LoService loService, String deviceId, String deviceName) {
 		this.loService = loService;
 		this.deviceId = deviceId;
+		this.deviceName = deviceName;
 	}	
 	
 	@Override
 	public Void call() throws Exception {
 		try {
-			loService.createDevice(deviceId);
+			loService.createDevice(deviceId, deviceName);
 			loService.sendStatus(deviceId);
 			LOG.debug("Device created for {}", deviceId);
 		} catch (Exception e) {

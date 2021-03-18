@@ -1,5 +1,6 @@
 package com.orange.lo.sample.sigfox2lo.lo;
 
+import com.orange.lo.sample.sigfox2lo.sigfox.SigfoxService;
 import com.orange.lo.sample.sigfox2lo.sigfox.model.DataUpDto;
 import com.orange.lo.sdk.LOApiClient;
 import com.orange.lo.sdk.externalconnector.DataManagementExtConnector;
@@ -27,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.orange.lo.sdk.rest.devicemanagement.Inventory.XCONNECTOR_DEVICES_PREFIX;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -40,11 +42,14 @@ import static org.mockito.Mockito.when;
 class LoServiceTest {
 
     public static final String NODE_ID = "N0D3ID1";
+    public static final String NODE_NAME = "N0D3ID1-name";
     private static final List<String> DEVICES = Arrays.asList("N0D3ID1", "N0D3ID2", "N0D3ID3", "N0D3ID4", "N0D3ID5");
     private static final String MESSAGE_ID = "0ZWkDm";
 
     @Mock
     private LOApiClient loApiClient;
+    @Mock
+    SigfoxService sigfoxService;
     @Mock
     private DeviceManagement deviceManagement;
     @Mock
@@ -66,15 +71,20 @@ class LoServiceTest {
         loProperties = new LoProperties();
         loProperties.setPageSize(20);
         loProperties.setDeviceGroup("sigfox");
-        loService = new LoService(loApiClient, loProperties, loDeviceCache, new RetryPolicy<>(), new RetryPolicy<>(),
+        com.orange.lo.sample.sigfox2lo.sigfox.model.Device device = new com.orange.lo.sample.sigfox2lo.sigfox.model.Device();
+    	device.setId(NODE_ID);
+    	device.setName(NODE_NAME);
+        when(sigfoxService.getDevice(NODE_ID)).thenReturn(device);
+        loService = new LoService(loApiClient, loProperties, sigfoxService, loDeviceCache, new RetryPolicy<>(), new RetryPolicy<>(),
                 new RetryPolicy<>());
     }
 
     @Test
     void shouldCallInventoryAndLoDeviceCacheWhenCreatingDevice() {
-        loService.createDevice(NODE_ID);
-
-        verify(inventory, times(1)).createDevice(contains(NODE_ID), contains(MESSAGE_ID));
+        loService.createDevice(NODE_ID, NODE_NAME);
+        Device device = new Device().withId(XCONNECTOR_DEVICES_PREFIX + NODE_ID).withName(NODE_NAME).withGroup(new Group().withId("0ZWkDm"));
+        
+        verify(inventory, times(1)).createDevice(device);
         verify(groups, times(1)).getGroups();
         verify(loDeviceCache, times(1)).add(contains(NODE_ID));
     }
@@ -132,11 +142,12 @@ class LoServiceTest {
     void shouldCallDataManagementExtConnectorAndInventoryAndLoDeviceCacheWhenMessageIsSentAndDeviceDoesNotExist() {
         DataUpDto dataUpDto = new DataUpDto();
         dataUpDto.setDevice(NODE_ID);
+        Device device = new Device().withId(XCONNECTOR_DEVICES_PREFIX + dataUpDto.getDevice()).withName(NODE_NAME).withGroup(new Group().withId("0ZWkDm"));
 
         loService.sendMessage(dataUpDto);
 
         verify(loDeviceCache, times(1)).add(NODE_ID);
-        verify(inventory, times(1)).createDevice(contains(NODE_ID), contains(MESSAGE_ID));
+        verify(inventory, times(1)).createDevice(device);
         verify(dataManagementExtConnector, times(1)).sendMessage(contains(NODE_ID), any(DataMessage.class));
     }
 

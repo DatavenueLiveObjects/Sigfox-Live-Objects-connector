@@ -1,12 +1,13 @@
 package com.orange.lo.sample.sigfox2lo;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orange.lo.sample.sigfox2lo.sigfox.model.DataUpDto;
-import com.orange.lo.sdk.LOApiClient;
-import com.orange.lo.sdk.externalconnector.DataManagementExtConnector;
-import com.orange.lo.sdk.externalconnector.model.DataMessage;
-import com.orange.lo.sdk.rest.devicemanagement.Inventory;
+import static com.orange.lo.sdk.rest.devicemanagement.Inventory.XCONNECTOR_DEVICES_PREFIX;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,13 +19,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static com.orange.lo.sdk.rest.devicemanagement.Inventory.XCONNECTOR_DEVICES_PREFIX;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.orange.lo.sample.sigfox2lo.sigfox.model.DataUpDto;
+import com.orange.lo.sdk.LOApiClient;
+import com.orange.lo.sdk.externalconnector.DataManagementExtConnector;
+import com.orange.lo.sdk.externalconnector.model.DataMessage;
+import com.orange.lo.sdk.rest.devicemanagement.Inventory;
+import com.orange.lo.sdk.rest.model.Device;
+import com.orange.lo.sdk.rest.model.Group;
 
 @SpringBootTest(classes = {Sigfox2loTestConfiguration.class})
 @AutoConfigureMockMvc
@@ -51,14 +54,15 @@ class Sigfox2loControllerTest {
 
         DataUpDto dataUpDto = getDataUpDto();
         String dataUpJson = objectMapper.writeValueAsString(dataUpDto);
-
+        
+        Device device = new Device().withId(XCONNECTOR_DEVICES_PREFIX + dataUpDto.getDevice()).withName("N0D3ID1-name").withGroup(new Group().withId("0ZWkDm")); 
         mockMvc.perform(post("/dataUp")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(dataUpJson)
         ).andExpect(status().isOk());
 
         verify(inventory, times(1))
-                .createDevice(XCONNECTOR_DEVICES_PREFIX + dataUpDto.getDevice(), "0ZWkDm");
+                .createDevice(device);
         verify(dataManagementExtConnector, times(1))
                 .sendMessage(eq(dataUpDto.getDevice()), argThat(dataMessage -> haveSameValue(dataUpJson, dataMessage)));
     }

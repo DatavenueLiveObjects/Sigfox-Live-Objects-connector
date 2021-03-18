@@ -24,20 +24,22 @@ class CreateDeviceTaskTest {
     void shouldCreateDeviceInLOWhenTaskIsCalled() throws InterruptedException {
         ExecutorService service = Executors.newFixedThreadPool(10);
         String deviceId = "N0D3ID0";
+        String deviceName = "N0D3ID0-name";
 
-        CreateDeviceTask createDeviceTask = new CreateDeviceTask(loService, deviceId);
+        CreateDeviceTask createDeviceTask = new CreateDeviceTask(loService, deviceId, deviceName);
         List<CreateDeviceTask> collection = Collections.singletonList(createDeviceTask);
         service.invokeAll(collection);
 
-        verify(loService, times(1)).createDevice(deviceId);
+        verify(loService, times(1)).createDevice(deviceId, deviceName);
     }
 
     @Test
     void shouldSendStatusToLOWhenTaskIsCalled() throws InterruptedException {
         ExecutorService service = Executors.newFixedThreadPool(10);
         String deviceId = "N0D3ID0";
+        String deviceName = "N0D3ID0-name";
 
-        CreateDeviceTask createDeviceTask = new CreateDeviceTask(loService, deviceId);
+        CreateDeviceTask createDeviceTask = new CreateDeviceTask(loService, deviceId, deviceName);
         List<CreateDeviceTask> collection = Collections.singletonList(createDeviceTask);
         service.invokeAll(collection);
 
