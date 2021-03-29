@@ -92,7 +92,7 @@ public class LoService {
 	}
 
 	public List<Device> getDevices() {
-		GetDevicesFilter filter = new GetDevicesFilter().withLimit(loProperties.getPageSize());
+		GetDevicesFilter filter = new GetDevicesFilter().withLimit(loProperties.getPageSize()).withGroupId(groupId);
 		List<Device> devices = new ArrayList<>();
 		for (int i = 0;; i++) {
 			int j = i;
