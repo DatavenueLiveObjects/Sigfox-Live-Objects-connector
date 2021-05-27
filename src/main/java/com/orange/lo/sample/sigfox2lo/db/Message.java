@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.util.Objects;
 
 @Entity
 public class Message {
@@ -63,5 +64,23 @@ public class Message {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Message)) return false;
+        Message message = (Message) o;
+        return Objects.equals(getId(), message.getId())
+                && Objects.equals(getTime(), message.getTime())
+                && Objects.equals(getDevice(), message.getDevice())
+                && Objects.equals(getDeviceTypeId(), message.getDeviceTypeId())
+                && Objects.equals(getSeqNumber(), message.getSeqNumber())
+                && Objects.equals(getData(), message.getData());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getTime(), getDevice(), getDeviceTypeId(), getSeqNumber(), getData());
     }
 }

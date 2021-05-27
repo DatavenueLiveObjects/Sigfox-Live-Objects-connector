@@ -3,6 +3,7 @@ package com.orange.lo.sample.sigfox2lo;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,9 @@ public class Sigfox2loController {
 	
 	@PostMapping("/dataUp")
     public ResponseEntity<Void> dataUp(@RequestBody DataUpDto dataUpDto) {
-		LOG.trace("dataUp endpoint received {}", dataUpDto);	
+		if (LOG.isTraceEnabled()) {
+			LOG.trace("dataUp endpoint received {}", StringEscapeUtils.escapeHtml4(dataUpDto.toString()));
+		}
 		SendMessageTask sendMessageTask = new SendMessageTask(loService, syncService, dataUpDto);
 		synchronizingExecutor.submit(sendMessageTask);
 		return ResponseEntity.ok().build();
