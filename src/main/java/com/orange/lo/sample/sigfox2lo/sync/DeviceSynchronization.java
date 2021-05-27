@@ -3,14 +3,15 @@ package com.orange.lo.sample.sigfox2lo.sync;
 import static com.orange.lo.sdk.rest.devicemanagement.Inventory.XCONNECTOR_DEVICES_PREFIX;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -53,7 +54,10 @@ public class DeviceSynchronization implements Synchronization {
         	// remove devices from LO
         	Set<String> devicesToRemoveFromLo = new HashSet<>(loDeviceIds);
         	devicesToRemoveFromLo.removeAll(sigFoxDevices.keySet());
-        	LOG.debug("Devices to remove from LO: {}", devicesToRemoveFromLo);
+			if (LOG.isDebugEnabled()) {
+				String input = Arrays.toString(devicesToRemoveFromLo.toArray());
+				LOG.debug("Devices to remove from LO: {}", StringEscapeUtils.escapeHtml4(input));
+			}
 
         	// add devices to LO
         	sigFoxDevices.keySet().removeAll(loDeviceIds);
