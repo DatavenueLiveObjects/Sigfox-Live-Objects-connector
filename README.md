@@ -2,7 +2,8 @@
 * [General info](#general-info)
 * [Technologies](#technologies)
 * [Requirements](#requirements)
-* [Building and installation](#building-and-installation)
+* [Getting the installation package](#getting-the-installation-package)
+* [Installation](#installation)
 * [Configuration](#configuration)
   * [Connector side](#connector-side) 
     * [Application](#application)
@@ -39,7 +40,7 @@ In order to run the connector you need to have:
 * **Sigfox account** 
 
 
-## Installation package
+## Getting the installation package
 
 The installation package can be acquired in one of two ways:
 
