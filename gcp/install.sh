@@ -3,8 +3,8 @@
 ## This startup script runs ON the compute vm
 
 BUCKET_NAME=sigfox2lo
-ZIP_NAME=sigfox2lo-1.0-SNAPSHOT.zip
-DIR_NAME=sigfox2lo-1.0-SNAPSHOT
+ZIP_NAME=sigfox2lo-1.1-SNAPSHOT.zip
+DIR_NAME=sigfox2lo-1.1-SNAPSHOT
 
 sudo su -
 apt-get install unzip

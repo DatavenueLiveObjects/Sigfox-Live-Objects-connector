@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "lo")
 public class LoProperties {
 
+	private static final String CONNECTOR_TYPE = "SIGFOX_LO_ADAPTER";
 	private static final int DEFAULT_PAGE_SIZE = 1000;
 	private static final String DEFAULT_HOSTNAME = "liveobjects.orange-business.com";
 	private static final int DEFAULT_SYNCHRONIZATION_THREAD_POOL_SIZE = 40;
@@ -34,6 +35,10 @@ public class LoProperties {
 	private String mqttPersistenceDir = DEFAULT_MQTT_PERSISTENCE_DIR;
 	private String messageDecoder;
 
+	public String getConnectorType() {
+        return CONNECTOR_TYPE;
+    }
+	
 	public String getHostname() {
 		return hostname;
 	}

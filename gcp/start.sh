@@ -2,7 +2,7 @@
 
 VM_NAME=sigfox2lo
 BUCKET_NAME=sigfox2lo
-ZIP_NAME=sigfox2lo-1.0-SNAPSHOT.zip
+ZIP_NAME=sigfox2lo-1.1-SNAPSHOT.zip
 
 mvn clean package -Prelease -f ../pom.xml
 
