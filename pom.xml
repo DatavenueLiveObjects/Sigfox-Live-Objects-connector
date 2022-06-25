@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>com.orange.lo.sample.sigfox</groupId>
 	<artifactId>sigfox2lo</artifactId>
-	<version>1.2</version>
+	<version>1.3-SNAPSHOT</version>
 	<name>sigfox2lo</name>
 	<description>Connector between SigFox and LiveObjects</description>
 
@@ -107,7 +107,7 @@
 		<url>https://github.com/DatavenueLiveObjects/Sigfox-Live-Objects-connector.git</url>
 		<connection>scm:git:${project.scm.url}</connection>
 		<developerConnection>scm:git:${project.scm.url}</developerConnection>
-		<tag>v1.2</tag>
+		<tag>v1.0</tag>
 	</scm>
 	<profiles>
 		<profile>
