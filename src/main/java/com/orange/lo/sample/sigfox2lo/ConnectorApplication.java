@@ -11,9 +11,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Sigfox2loApplication {
+public class ConnectorApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Sigfox2loApplication.class, args);
+		SpringApplication.run(ConnectorApplication.class, args);
 	}
 }
